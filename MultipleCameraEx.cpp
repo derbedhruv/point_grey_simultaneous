@@ -6,7 +6,7 @@ using namespace FlyCapture2;
 void PrintCameraInfo( CameraInfo* pCamInfo )
 {
     printf(
-        "\n*** totally total CAMERA INFORMATION ***\n"
+        "\n*** CAMERA INFORMATION ***\n"
         "Serial number - %u\n"
         "Camera model - %s\n"
         "Camera vendor - %s\n"
@@ -46,60 +46,50 @@ int main(int, char**) {
     // create a new array of cameras     
     Camera* pcam[2] = {new Camera(), new Camera()};
 
-   for (unsigned int i=0; i<numCameras; i++) {
-     // connect to a camera 
-     PGRGuid guid;
-     error = busMgr.GetCameraFromIndex( i, &guid );
-     if (error != PGRERROR_OK)
+    // now we do the formalities needed to establish a connection
+    for (unsigned int i=0; i<numCameras; i++) {
+      // connect to a camera 
+      PGRGuid guid;
+      error = busMgr.GetCameraFromIndex( i, &guid );
+      if (error != PGRERROR_OK)
         {
             PrintError( error );
             return -1;
         }
 
-     error = pcam[i]->Connect(&guid);
-     if (error != PGRERROR_OK)
+      error = pcam[i]->Connect(&guid);
+      if (error != PGRERROR_OK)
         {
             PrintError( error );
             return -1;
         }
 
       // Get the camera information
-        error = pcam[i]->GetCameraInfo( &camInfo );
-        if (error != PGRERROR_OK)
+      error = pcam[i]->GetCameraInfo( &camInfo );
+      if (error != PGRERROR_OK)
         {
             PrintError( error );
             return -1;
         }
-	// PrintCameraInfo(&camInfo);
-      }
-	// the following line proved that we can retrieve caminfo from each cmaera after this process
-	// pcam[1]->GetCameraInfo(&camInfo);
+      // uncomment the following line if you really care about the camera info
+      // PrintCameraInfo(&camInfo);
 
-	// now we'll try to capture an image from each
-	Image rawImage;
-	// Camera cam1, cam2;
-	// cam1 = Camera(*pcam[0]);
-  	  // Start capturing images from camera 0
-    	  error = pcam[0]->StartCapture();
-    	  if (error != PGRERROR_OK)
+      // Next we turn isochronous images capture ON for both cameras
+      error = pcam[i]->StartCapture();
+      if (error != PGRERROR_OK)
     	  {
        	 	PrintError( error );
        	 	return -1;
     	  }
-	// capture images from camera 1
-         error = pcam[1]->StartCapture();
-          if (error != PGRERROR_OK)
-          {
-                PrintError( error );
-                return -1;
-          }
 
+     }
 
-/**/
+	// now we'll try to capture an image from each
+	Image rawImage;	// prepare the image object and keep
+  	
 	unsigned int numImages = 3;
 	for (unsigned int j=0; j <numImages; j++ ) {
 
-	  // cmaera 0 ka kaam....
 	  error = pcam[0]->RetrieveBuffer( &rawImage );
           if (error != PGRERROR_OK)
           {

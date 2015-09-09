@@ -115,7 +115,7 @@ int main(int, char**) {
 		);
 
 		// Convert the raw image
-		error = rawImage.Convert( PIXEL_FORMAT_RGB8, &convertedImage );
+		error = rawImage.Convert( PIXEL_FORMAT_RGB, &convertedImage );
 		if (error != PGRERROR_OK)
 		{
 		  PrintError( error );
@@ -124,7 +124,7 @@ int main(int, char**) {
 
 		// Create a unique filename
 		char filename[512];
-		sprintf( filename, "./images/cam--%d-%d.pgm", cam, j);
+		sprintf( filename, "./images/cam--%d-%d.tiff", cam, j);
 
 		// Save the image. If a file format is not passed in, then the file
 		// extension is parsed to attempt to determine the file format.

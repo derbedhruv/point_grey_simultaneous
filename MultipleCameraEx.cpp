@@ -104,8 +104,18 @@ int main(int, char**) {
 		  continue;
 		}
 
+		// We'll also print out a timestamp
+	        TimeStamp timestamp = rawImage.GetTimeStamp();
+                printf(
+                  "Cam %d - Frame %d - TimeStamp [%d %d]\n",
+                  cam,
+                  j,
+                  timestamp.cycleSeconds,
+                  timestamp.cycleCount
+		);
+
 		// Convert the raw image
-		error = rawImage.Convert( PIXEL_FORMAT_MONO8, &convertedImage );
+		error = rawImage.Convert( PIXEL_FORMAT_RGB8, &convertedImage );
 		if (error != PGRERROR_OK)
 		{
 		  PrintError( error );
@@ -125,7 +135,19 @@ int main(int, char**) {
 		  return -1;
 		}
 	    }
-
 	}
-/**/
+
+    for ( unsigned int i = 0; i < numCameras; i++ )
+    {
+        pcam[i]->StopCapture();
+        pcam[i]->Disconnect();
+        delete pcam[i];
+    }
+
+    // delete [] pcam;
+
+    printf( "Done! Press Enter to exit...\n" );
+    getchar();
+
+        return 0;
 }

@@ -35,6 +35,7 @@ int main(int, char**) {
 
     BusManager busMgr;
     unsigned int numCameras;
+
     error = busMgr.GetNumOfCameras(&numCameras);
     if (error != PGRERROR_OK)
     {
@@ -44,12 +45,14 @@ int main(int, char**) {
     printf("cameras: %u\n", numCameras);
 
     // create a new array of cameras     
-    Camera* pcam[2] = {new Camera(), new Camera()};
+    Camera* pcam[2] ;
 
     // now we do the formalities needed to establish a connection
     for (unsigned int i=0; i<numCameras; i++) {
       // connect to a camera 
       PGRGuid guid;
+      pcam[i] = new Camera();
+
       error = busMgr.GetCameraFromIndex( i, &guid );
       if (error != PGRERROR_OK)
         {
@@ -85,68 +88,43 @@ int main(int, char**) {
      }
 
 	// now we'll try to capture an image from each
-	Image rawImage;	// prepare the image object and keep
+	Image rawImage, convertedImage;	// prepare the image object and keep
   	
+	// no of images to capture
 	unsigned int numImages = 3;
+
+
 	for (unsigned int j=0; j <numImages; j++ ) {
+	    for (unsigned int cam=0; cam < numCameras; cam++) {
 
-	  error = pcam[0]->RetrieveBuffer( &rawImage );
-          if (error != PGRERROR_OK)
-          {
-              PrintError( error );
-              continue;
-          }
-         // Create a converted image
-          Image convertedImage;
+		error = pcam[cam]->RetrieveBuffer( &rawImage );
+		if (error != PGRERROR_OK)
+		{
+		  PrintError( error );
+		  continue;
+		}
 
-          // Convert the raw image
-          error = rawImage.Convert( PIXEL_FORMAT_MONO8, &convertedImage );
-          if (error != PGRERROR_OK)
-          {
-            PrintError( error );
-            return -1;
-          }
+		// Convert the raw image
+		error = rawImage.Convert( PIXEL_FORMAT_MONO8, &convertedImage );
+		if (error != PGRERROR_OK)
+		{
+		  PrintError( error );
+		  return -1;
+		}
 
-          // Create a unique filename
-          char filename[512];
-          sprintf( filename, "./images/Firstcam-%d.pgm", j);
+		// Create a unique filename
+		char filename[512];
+		sprintf( filename, "./images/cam--%d-%d.pgm", cam, j);
 
-          // Save the image. If a file format is not passed in, then the file
-          // extension is parsed to attempt to determine the file format.
-          error = convertedImage.Save( filename );
-          if (error != PGRERROR_OK)
-          {
-            PrintError( error );
-            return -1;
-          }
-
-	  // camera 2 images storage...
-          error = pcam[1]->RetrieveBuffer( &rawImage );
-          if (error != PGRERROR_OK)
-          {
-              PrintError( error );
-              continue;
-          }
-
-          // Convert the raw image
-          error = rawImage.Convert( PIXEL_FORMAT_MONO8, &convertedImage );
-          if (error != PGRERROR_OK)
-          {
-            PrintError( error );
-            return -1;
-          }
-
-          // Create a unique filename
-          sprintf( filename, "./images/Secondcam-%d.pgm", j);
-
-          // Save the image. If a file format is not passed in, then the file
-          // extension is parsed to attempt to determine the file format.
-          error = convertedImage.Save( filename );
-          if (error != PGRERROR_OK)
-          {
-            PrintError( error );
-            return -1;
-          }	
+		// Save the image. If a file format is not passed in, then the file
+		// extension is parsed to attempt to determine the file format.
+		error = convertedImage.Save( filename );
+		if (error != PGRERROR_OK)
+		{
+	  	  PrintError( error );
+		  return -1;
+		}
+	    }
 
 	}
 /**/

@@ -28,7 +28,7 @@ void PrintError( Error error )
     error.PrintErrorTrace();
 }
 
-int main(int, char**) {
+int main(int argc, char* argv[]) {
 
     Error error;
     CameraInfo camInfo;
@@ -90,11 +90,17 @@ int main(int, char**) {
 	// now we'll try to capture an image from each
 	Image rawImage, convertedImage;	// prepare the image object and keep
   	
-	// no of images to capture
-	unsigned int numImages = 3;
+	// no of images to capture is given as a numerical argument to the program
+	// check if this has actuallybeen given, or else use default..
+	unsigned int numImages = 10;
+	if (argc < 2) {
+	  printf("No parameter entered for number of images, going with default 10.\n");
+	} else {
+  	  numImages = (int)*argv[1];
+	}
 
 
-	for (unsigned int j=0; j <numImages; j++ ) {
+	for (unsigned int j=0; j < numImages; j++ ) {
 	    for (unsigned int cam=0; cam < numCameras; cam++) {
 
 		error = pcam[cam]->RetrieveBuffer( &rawImage );

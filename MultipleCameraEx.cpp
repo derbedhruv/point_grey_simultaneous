@@ -1,7 +1,9 @@
 /* test what resolutions and other modes the camera connected can provide */
 #include "FlyCapture2.h"
+#include <vector>
 
 using namespace FlyCapture2;
+using namespace std;
 
 void PrintCameraInfo( CameraInfo* pCamInfo )
 {
@@ -89,17 +91,19 @@ int main(int argc, char* argv[]) {
 
 	// now we'll try to capture an image from each
 	Image rawImage, convertedImage;	// prepare the image object and keep
-  	
 	// no of images to capture is given as a numerical argument to the program
 	// check if this has actuallybeen given, or else use default..
-	unsigned int numImages = 10;
+	unsigned int numImages = 50;
 	if (argc < 2) {
-	  printf("No parameter entered for number of images, going with default 10.\n");
+	  printf("No parameter entered for number of images, going with default 50.\n");
 	} else {
-  	  numImages = (int)*argv[1];
+  	  // numImages = (int)*argv[1];
+	  numImages = 1;
 	}
-
-
+	std::vector<Image> vecImages1;
+        vecImages1.resize(numImages);
+	std::vector<Image> vecImages2;
+        vecImages2.resize(numImages);
 	for (unsigned int j=0; j < numImages; j++ ) {
 	    for (unsigned int cam=0; cam < numCameras; cam++) {
 
@@ -120,29 +124,55 @@ int main(int argc, char* argv[]) {
                   timestamp.cycleCount
 		);
 
-		// Convert the raw image
-		error = rawImage.Convert( PIXEL_FORMAT_RGB, &convertedImage );
-		if (error != PGRERROR_OK)
-		{
-		  PrintError( error );
-		  return -1;
-		}
-
-		// Create a unique filename
-		char filename[512];
-		sprintf( filename, "./images/cam--%d-%d.tiff", cam, j);
-
-		// Save the image. If a file format is not passed in, then the file
-		// extension is parsed to attempt to determine the file format.
-		error = convertedImage.Save( filename );
-		if (error != PGRERROR_OK)
-		{
-	  	  PrintError( error );
-		  return -1;
+		if(cam==0) {
+			vecImages1[j].DeepCopy(&rawImage);
+		} else {
+			vecImages2[j].DeepCopy(&rawImage);
 		}
 	    }
 	}
+	//Process and store the images captured
+	for (unsigned int j=0; j < numImages; j++) {
+		error = vecImages1[j].Convert( PIXEL_FORMAT_RGB, &convertedImage );
+                if (error != PGRERROR_OK)
+                {
+                  PrintError( error );
+                  return -1;
+                }
 
+                // Create a unique filename
+                char filename[512];
+                sprintf( filename, "./images/cam--%d-%d.tiff", 0, j);
+
+                // Save the image. If a file format is not passed in, then the file
+                // extension is parsed to attempt to determine the file format.
+                error = convertedImage.Save( filename );
+                if (error != PGRERROR_OK)
+                {
+                  PrintError( error );
+                  return -1;
+                }
+		//Do the same for the second camera
+		error = vecImages2[j].Convert( PIXEL_FORMAT_RGB, &convertedImage );
+                if (error != PGRERROR_OK)
+                {
+                  PrintError( error );
+                  return -1;
+                }
+
+                // Create a unique filename
+                char filename2[512];
+                sprintf( filename2, "./images/cam--%d-%d.tiff", 1, j);
+
+                // Save the image. If a file format is not passed in, then the file
+                // extension is parsed to attempt to determine the file format.
+                error = convertedImage.Save( filename2 );
+                if (error != PGRERROR_OK)
+                {
+                  PrintError( error );
+                  return -1;
+                }
+	}
     for ( unsigned int i = 0; i < numCameras; i++ )
     {
         pcam[i]->StopCapture();

@@ -132,6 +132,7 @@ int main(int argc, char* argv[]) {
 	    }
 	}
 	//Process and store the images captured
+	printf("Saving images.. please wait\n");
 	for (unsigned int j=0; j < numImages; j++) {
 		error = vecImages1[j].Convert( PIXEL_FORMAT_RGB, &convertedImage );
                 if (error != PGRERROR_OK)

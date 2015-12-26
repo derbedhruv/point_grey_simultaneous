@@ -2,8 +2,8 @@
 
 CC = g++
 OUTPUTNAME = out${D}
-INCLUDE = -I./include/h
-LIBS = -L/usr/src/flycapture/lib -lflycapture${D}
+INCLUDE = -I./include/h -I/usr/include/
+LIBS = -L/usr/src/flycapture/lib -lflycapture${D} -ldl -lm `pkg-config --libs --cflags opencv`
 
 OUTDIR = .
 

@@ -104,7 +104,7 @@ int main(int argc, char* argv[]) {
 
 	// no of images to capture is given as a numerical argument to the program
 	// check if this has actuallybeen given, or else use default..
-	unsigned int numImages = 50;
+	unsigned int numImages = 5;
 	if (argc < 2) {
 	  printf("No parameter entered for number of images, going with default 50.\n");
 	} else {
@@ -115,25 +115,41 @@ int main(int argc, char* argv[]) {
         vecImages1.resize(numImages);
 	std::vector<Image> vecImages2;
         vecImages2.resize(numImages);
-	int slitRow = 600, slitCol = 1024, slitStart = 400, slitMove = 2;
+	int slitRow = 600, slitCol = 800, slitStart = 250, slitMove = 1;
 	cv::Mat projectedSlit(slitRow, slitCol, CV_8UC1);
+	cv::cvtColor(projectedSlit, projectedSlit, CV_GRAY2RGB);
+	cout << projectedSlit.at<cv::Vec3b>(0,0).val[0] << endl;
+	    
+	// we'll create a namedWindow which can be closed by us
+	cvNamedWindow("Image1", CV_WINDOW_NORMAL);
+	cvSetWindowProperty("Image1", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
+	cv::imshow("Image1", projectedSlit);
+	cv::waitKey(1000);
+
+	cv::Vec3b black, green;
+	black.val[0] = 0; black.val[1] = 0; black.val[2] = 0;
+	green.val[0] = 0; green.val[1] = 255; green.val[2] = 0;
+
+
+	cout << "before the loop" <<endl;
 
 	for (unsigned int j=0; j < numImages; j++ ) {
 	    // first display the window with the slit
-	    // we'll create a namedWindow which can be closed by us
-	    cvNamedWindow("Image1", CV_WINDOW_NORMAL);
-	    cvSetWindowProperty("Image1", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
-	    
 	    // We will update the Mat object and update the slit position
-	    for (int a = 0; a < slitCol; a++) {
+
+	    for (int a = 0; a < slitRow; a++) {
 		if (j > 0) {
-		    projectedSlit.at<uchar>(a, slitStart + (j - 1)*slitMove) = 0;
+		     projectedSlit.at<cv::Vec3b>(cv::Point(slitStart + (j - 1)*slitMove, a)) = black;
+		    // projectedSlit.at<uchar>(a, slitStart + (j - 1)*slitMove) = 0;
 		}
-		projectedSlit.at<uchar>(a, slitStart + j*slitMove) = 255;
+		cout << a << ", " << j << endl;
+		projectedSlit.at<cv::Vec3b>(cv::Point(slitStart + j*slitMove, a)) = green;
+		// projectedSlit.at<uchar>(a, slitStart + j*slitMove) = 255;
 	    }
 
 	    cv::imshow("Image1", projectedSlit);
 	    cv::waitKey(10);
+
 
 	    // then we capture the image from both cameras
 	    for (unsigned int cam=0; cam < numCameras; cam++) {

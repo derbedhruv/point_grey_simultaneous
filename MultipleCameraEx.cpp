@@ -101,12 +101,6 @@ int main(int argc, char* argv[]) {
 	// now we'll try to capture an image from each
 	Image rawImage, convertedImage;	// prepare the image object and keep
 
-	// testing the display of a Mat object which is under our control
-	cv::Mat image(600, 1024, CV_8UC1);
-	cvNamedWindow("Image1", CV_WINDOW_NORMAL);
-	cvSetWindowProperty("Image1", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
-	cv::imshow("Image1", image);
-	cv::waitKey(0);
 
 	// no of images to capture is given as a numerical argument to the program
 	// check if this has actuallybeen given, or else use default..
@@ -121,7 +115,27 @@ int main(int argc, char* argv[]) {
         vecImages1.resize(numImages);
 	std::vector<Image> vecImages2;
         vecImages2.resize(numImages);
+	int slitRow = 600, slitCol = 1024, slitStart = 400, slitMove = 2;
+	cv::Mat projectedSlit(slitRow, slitCol, CV_8UC1);
+
 	for (unsigned int j=0; j < numImages; j++ ) {
+	    // first display the window with the slit
+	    // we'll create a namedWindow which can be closed by us
+	    cvNamedWindow("Image1", CV_WINDOW_NORMAL);
+	    cvSetWindowProperty("Image1", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
+	    
+	    // We will update the Mat object and update the slit position
+	    for (int a = 0; a < slitCol; a++) {
+		if (j > 0) {
+		    projectedSlit.at<uchar>(a, slitStart + (j - 1)*slitMove) = 0;
+		}
+		projectedSlit.at<uchar>(a, slitStart + j*slitMove) = 255;
+	    }
+
+	    cv::imshow("Image1", projectedSlit);
+	    cv::waitKey(10);
+
+	    // then we capture the image from both cameras
 	    for (unsigned int cam=0; cam < numCameras; cam++) {
 		error = pcam[cam]->RetrieveBuffer( &rawImage );
 		if (error != PGRERROR_OK)
@@ -149,6 +163,11 @@ int main(int argc, char* argv[]) {
 		}
 	    }
 	}
+
+	// then destroy the window
+	cvDestroyWindow("Image1"); 
+
+
 	//Process and store the images captured
 	if (numCameras > 0) {
   	printf("Saving images.. please wait\n");

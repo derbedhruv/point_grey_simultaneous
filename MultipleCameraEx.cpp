@@ -104,7 +104,7 @@ int main(int argc, char* argv[]) {
 
 	// no of images to capture is given as a numerical argument to the program
 	// check if this has actuallybeen given, or else use default..
-	unsigned int numImages = 100;
+	unsigned int numImages = 50;
 	if (argc < 2) {
 	  printf("No parameter entered for number of images, going with default 50.\n");
 	} else {
@@ -115,7 +115,7 @@ int main(int argc, char* argv[]) {
         vecImages1.resize(numImages);
 	std::vector<Image> vecImages2;
         vecImages2.resize(numImages);
-	int slitRow = 1200, slitCol = 1600, slitStart = 500, slitMove = 1;
+	int slitRow = 1200, slitCol = 1600, slitStart = 0.2*slitRow, slitMove = 0.6*slitRow/50;
 	cv::Mat projectedSlit(slitRow, slitCol, CV_8UC1);
 	cv::cvtColor(projectedSlit, projectedSlit, CV_GRAY2RGB);
 	cout << projectedSlit.at<cv::Vec3b>(0,0).val[0] << endl;
@@ -126,9 +126,10 @@ int main(int argc, char* argv[]) {
 	cv::imshow("Image1", projectedSlit);
 	cv::waitKey(1000);
 
-	cv::Vec3b black, green;
+	cv::Vec3b black, green, white;
 	black.val[0] = 0; black.val[1] = 0; black.val[2] = 0;
 	green.val[0] = 0; green.val[1] = 255; green.val[2] = 0;
+	white.val[0] = 150; white.val[1] = 150; white.val[2] = 150;
 
 	for (unsigned int j=0; j < numImages; j++ ) {
 	    // first display the window with the slit
@@ -139,7 +140,7 @@ int main(int argc, char* argv[]) {
 		     projectedSlit.at<cv::Vec3b>(cv::Point(slitStart + (j - 1)*slitMove, a)) = black;
 		    // projectedSlit.at<uchar>(a, slitStart + (j - 1)*slitMove) = 0;
 		}
-		projectedSlit.at<cv::Vec3b>(cv::Point(slitStart + j*slitMove, a)) = green;
+		projectedSlit.at<cv::Vec3b>(cv::Point(slitStart + j*slitMove, a)) = white;
 		// projectedSlit.at<uchar>(a, slitStart + j*slitMove) = 255;
 	    }
 

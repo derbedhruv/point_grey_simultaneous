@@ -44,6 +44,15 @@ void PrintError( Error error )
 
 int main(int argc, char* argv[]) {
 
+    // instructions on how to use this software
+    cout << "Welcome to the ASI software.\n There are two modes - calibration and data mode. The calibration mode enables you to take pictures from each camera one at a time while changing the orientation of the checkerboard pattern with each 'run'. The Scanning mode is where a moving slit is projected onto the object and  images taken by both cameras are synchronized with it." << endl;
+    cout << "The general syntax of the command is \n\n" << endl;
+    cout << "./out Mode Number Intensity Colour\n\n" << endl;
+    cout << "Here, \n  Mode -  specifies the mode. 0 for calibration and 1 for Scanning." << endl;
+    cout << "  Number - specifies the no of pairs of images you want to take for either mode. Range 0 to 200." << endl;
+    cout << "  Intensity - specifies the intensity of the brightness of the projected pattern. 0 - 255." << endl;
+    cout << "  Colour - specifies which colour to use, options between white and green. Specified as 'w' and 'g'." << endl;
+
     Error error;
     CameraInfo camInfo;
 

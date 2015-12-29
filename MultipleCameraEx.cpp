@@ -3,13 +3,16 @@
 
   AUTHORS: Dhruv Joshi, Darpan Sanghavi
 
+  compile using 'make'.
+  This code projects a moving slit (white or green) from a laser projector onto an object of interest. This is captured by two Point Grey Blackfly cameras and saved as TIFF images.
   
 *****************************************************************/
 
 #include "FlyCapture2.h"
 #include <vector>
 #include <opencv2/opencv.hpp>
-
+#include <cstring>
+#include <cstdlib>
 
 using namespace FlyCapture2;
 using namespace std;
@@ -46,6 +49,8 @@ int main(int argc, char* argv[]) {
 
     BusManager busMgr;
     unsigned int numCameras;
+
+    bool calibration_mode = false;
 
     error = busMgr.GetNumOfCameras(&numCameras);
     if (error != PGRERROR_OK)
@@ -107,9 +112,15 @@ int main(int argc, char* argv[]) {
 	unsigned int numImages = 50;
 	if (argc < 2) {
 	  printf("No parameter entered for number of images, going with default 50.\n");
+	  calibration_mode = false;
 	} else {
   	  // numImages = (int)*argv[1];
-	  numImages = 1;
+	  if (!strcmp(argv[1],"0")) {
+	    cout << "Entering Calibration Mode." << endl;
+	    cout << "One image from each camera shall be taken, after which the user will have to manually change the position of the checkerboard target and press Enter. Number of images to be taken has been specified as " << argv[2] << endl;
+	    numImages = atoi(argv[2]);
+	    calibration_mode = true;
+	  }
 	}
 	std::vector<Image> vecImages1;
         vecImages1.resize(numImages);

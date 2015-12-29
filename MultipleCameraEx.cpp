@@ -113,15 +113,12 @@ int main(int argc, char* argv[]) {
 
 
 	// no of images to capture is given as a numerical argument to the program
-	// check if this has actuallybeen given, or else use default..
-	unsigned int numImages = 50;
-
 
 	// checking command line parameters
 	bool mode_specified = false, count_specified = false, int_specified = false, color_specified = false;
 	
 	// setting defaults. mode is slit, no of images is 50, intensity is midway and color is white.
-	int mode = 0, count = 50, intensity = 255, color = 0;
+	int mode = 0, numImages = 50, intensity = 255, color = 0;
 
 	// playing around with command line arguments
 	for (int cmd = 1; cmd < argc - 1; cmd += 2) {
@@ -138,8 +135,8 @@ int main(int argc, char* argv[]) {
 
 	  } else if (!strcmp(argv[cmd],"-count")) {
 	    count_specified = true;
-	    // cout << "no of images is " << atoi(argv[cmd + 1]) << endl;
-	    count = atoi(argv[cmd + 1]);
+	    cout << "no of images is " << atoi(argv[cmd + 1]) << endl;
+	    numImages = atoi(argv[cmd + 1]);
 	  } else if (!strcmp(argv[cmd],"-int")) {
 	    int_specified = true;
             cout << "brightness of illumination is " << atoi(argv[cmd + 1]) << endl;

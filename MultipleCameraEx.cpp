@@ -138,7 +138,7 @@ int main(int argc, char* argv[]) {
 
 	  } else if (!strcmp(argv[cmd],"-count")) {
 	    count_specified = true;
-	    cout << "no of images is " << atoi(argv[cmd + 1]) << endl;
+	    // cout << "no of images is " << atoi(argv[cmd + 1]) << endl;
 	    count = atoi(argv[cmd + 1]);
 	  } else if (!strcmp(argv[cmd],"-int")) {
 	    int_specified = true;
@@ -189,8 +189,8 @@ int main(int argc, char* argv[]) {
 
 	cv::Vec3b black, green, white, slit_color;
 	black.val[0] = 0; black.val[1] = 0; black.val[2] = 0;
-	green.val[0] = 0; green.val[1] = 255; green.val[2] = 0;
-	white.val[0] = 255; white.val[1] = 255; white.val[2] = 255;
+	green.val[0] = 0; green.val[1] = intensity; green.val[2] = 0;
+	white.val[0] = intensity; white.val[1] = intensity; white.val[2] = intensity;
 
 	if (color == 0) {
 	  slit_color = white;

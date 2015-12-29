@@ -55,8 +55,6 @@ int main(int argc, char* argv[]) {
     BusManager busMgr;
     unsigned int numCameras;
 
-    bool calibration_mode = false;
-
     error = busMgr.GetNumOfCameras(&numCameras);
     if (error != PGRERROR_OK)
     {
@@ -108,11 +106,8 @@ int main(int argc, char* argv[]) {
 
      }
 
-	// now we'll try to capture an image from each
 	Image rawImage, convertedImage;	// prepare the image object and keep
 
-
-	// no of images to capture is given as a numerical argument to the program
 
 	// checking command line parameters
 	bool mode_specified = false, count_specified = false, int_specified = false, color_specified = false;
@@ -120,7 +115,7 @@ int main(int argc, char* argv[]) {
 	// setting defaults. mode is slit, no of images is 50, intensity is midway and color is white.
 	int mode = 0, numImages = 50, intensity = 255, color = 0;
 
-	// playing around with command line arguments
+	// parse command line arguments
 	for (int cmd = 1; cmd < argc - 1; cmd += 2) {
 	  if (!strcmp(argv[cmd],"-mode")) {
 	    if (!strcmp(argv[cmd + 1], "slit")) {
@@ -132,7 +127,6 @@ int main(int argc, char* argv[]) {
 		cout << "mode is calibration" << endl;
 		mode = 1;
 	    } 
-
 	  } else if (!strcmp(argv[cmd],"-count")) {
 	    count_specified = true;
 	    cout << "no of images is " << atoi(argv[cmd + 1]) << endl;
@@ -158,17 +152,6 @@ int main(int argc, char* argv[]) {
           }
 	}
 
-	if (argc < 2) {
-	  printf("No parameter entered for number of images, going with default 50.\n");
-	  calibration_mode = false;
-	} else {
-	  if (!strcmp(argv[1],"0")) {
-	    cout << "Entering Calibration Mode." << endl;
-	    cout << "One image from each camera shall be taken, after which the user will have to manually change the position of the checkerboard target and press Enter. Number of images to be taken has been specified as " << argv[2] << endl;
-	    numImages = atoi(argv[2]);
-	    calibration_mode = true;
-	  }
-	}
 	std::vector<Image> vecImages1;
         vecImages1.resize(numImages);
 	std::vector<Image> vecImages2;
@@ -176,7 +159,6 @@ int main(int argc, char* argv[]) {
 	int slitRow = 1200, slitCol = 1600, slitStart = 0.3*slitRow, slitMove = 0.6*slitRow/50;
 	cv::Mat projectedSlit(slitRow, slitCol, CV_8UC1);
 	cv::cvtColor(projectedSlit, projectedSlit, CV_GRAY2RGB);
-	cout << projectedSlit.at<cv::Vec3b>(0,0).val[0] << endl;
 	    
 	// we'll create a namedWindow which can be closed by us
 	cvNamedWindow("Image1", CV_WINDOW_NORMAL);
@@ -189,27 +171,37 @@ int main(int argc, char* argv[]) {
 	green.val[0] = 0; green.val[1] = intensity; green.val[2] = 0;
 	white.val[0] = intensity; white.val[1] = intensity; white.val[2] = intensity;
 
+	// set the color of the slit based on cmdline parameters
 	if (color == 0) {
 	  slit_color = white;
 	} else if (color == 1) {
 	  slit_color = green;
 	}
 
-	for (unsigned int j=0; j < numImages; j++ ) {
+
+	// if the mode is calibration, we just show a white screen
+	if (mode == 1) {
+	  projectedSlit = cv::Scalar(intensity, intensity, intensity);
+	  cv::imshow("Image1", projectedSlit);
+	  cv::waitKey(100);
+	}
+
+	for (int j=0; j < numImages; j++ ) {
 	    // first display the window with the slit
 	    // We will update the Mat object and update the slit position
 
+	  // if the mode is slitscan, prepare the slit
+	  if (mode == 0) {
 	    for (int a = 400; a < 800; a++) {
 		if (j > 0) {
 		     projectedSlit.at<cv::Vec3b>(cv::Point(a, slitStart + (j - 1)*slitMove)) = black;
-		    // projectedSlit.at<uchar>(a, slitStart + (j - 1)*slitMove) = 0;
 		}
 		projectedSlit.at<cv::Vec3b>(cv::Point(a, slitStart + j*slitMove)) = slit_color;
-		// projectedSlit.at<uchar>(a, slitStart + j*slitMove) = 255;
 	    }
 
 	    cv::imshow("Image1", projectedSlit);
 	    cv::waitKey(1);
+	  }
 
 
 	    // then we capture the image from both cameras
@@ -220,18 +212,6 @@ int main(int argc, char* argv[]) {
 		  PrintError( error );
 		  continue;
 		}
-
-	/*
-		// We'll also print out a timestamp
-	        TimeStamp timestamp = rawImage.GetTimeStamp();
-                printf(
-                  "Cam %d - Frame %d - TimeStamp [%d %d]\n",
-                  cam,
-                  j,
-                  timestamp.cycleSeconds,
-                  timestamp.cycleCount
-		);
-	*/
 
 		if(cam==0) {
 			vecImages1[j].DeepCopy(&rawImage);
@@ -248,7 +228,7 @@ int main(int argc, char* argv[]) {
 	//Process and store the images captured
 	if (numCameras > 0) {
   	printf("Saving images.. please wait\n");
-  	for (unsigned int j=0; j < numImages; j++) {
+  	for (int j=0; j < numImages; j++) {
   		error = vecImages1[j].Convert( PIXEL_FORMAT_RGB, &convertedImage );
                   if (error != PGRERROR_OK)
                   {

@@ -178,13 +178,8 @@ int main(int argc, char* argv[]) {
 	  slit_color = green;
 	}
 
+	cvStartWindowThread();
 
-	// if the mode is calibration, we just show a white screen
-	if (mode == 1) {
-	  projectedSlit = cv::Scalar(intensity, intensity, intensity);
-	  cv::imshow("Image1", projectedSlit);
-	  cv::waitKey(100);
-	}
 
 	for (int j=0; j < numImages; j++ ) {
 	    // first display the window with the slit
@@ -203,6 +198,14 @@ int main(int argc, char* argv[]) {
 	    cv::waitKey(1);
 	  }
 
+	  // if the mode is calibration, we just show a white screen
+	  if (mode == 1) {
+	      cout << "Setting static illumination for calibration" << endl;
+	      projectedSlit = cv::Scalar(intensity, intensity, intensity);
+	      cv::imshow("Image1", projectedSlit);
+	      cv::waitKey(1);
+	  }
+
 
 	    // then we capture the image from both cameras
 	    for (unsigned int cam=0; cam < numCameras; cam++) {
@@ -218,6 +221,14 @@ int main(int argc, char* argv[]) {
 		} else {
 			vecImages2[j].DeepCopy(&rawImage);
 		}
+	    }
+	    
+	    if (mode == 1) {
+		// cvDestroyWindow("Image1"); 
+		cv::waitKey(0);
+	        cout << "Captured image " << j << " of " << numImages << endl;
+		// cout << "Press ENTER to continue...";
+		// cin.ignore();
 	    }
 	}
 

@@ -152,6 +152,20 @@ int main(int argc, char* argv[]) {
           }
 	}
 
+	// handling default cases in case of not entering arguments..
+	if (mode_specified == false) {
+	  cout << "Mode not specified. going with slitscan." << endl;
+	} 
+	if (count_specified == false) {
+	  cout << "No of images not specified, default is 50." << endl;
+	}
+	if (int_specified == false) {
+	  cout << "Intensity not specified, going with max" << endl;
+	}
+	if (color_specified == false) {
+	  cout << "Colour not specified, default is white" << endl;
+	}
+
 	std::vector<Image> vecImages1;
         vecImages1.resize(numImages);
 	std::vector<Image> vecImages2;
